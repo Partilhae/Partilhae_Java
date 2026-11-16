@@ -15,16 +15,16 @@ import br.com.partilhae.partilhae.model.converter.BooleanCharConverter;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "idReceptor")
 @Schema(
-        name = "Receptor",
-        description = "Informações complementares de um usuário com perfil de receptor"
+        name = "Beneficiário",
+        description = "Informações complementares de um usuário com perfil de beneficiário"
 )
-public class Receptor {
+public class Beneficiario {
 
     @Id
     @SequenceGenerator(name = "receptor_seq", sequenceName = "seq_receptor", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receptor_seq")
     @Column(name = "id_receptor")
-    @Schema(description = "ID único do receptor", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Identificador do beneficiário no contrato atual", example = "100", accessMode = Schema.AccessMode.READ_ONLY)
     private Long idReceptor;
 
     @Column(name = "qtd_pessoas_familia")
@@ -42,7 +42,7 @@ public class Receptor {
 
     @Size(max = 200)
     @Column(name = "ds_observacao", length = 200)
-    @Schema(description = "Observações adicionais do receptor", example = "Família composta por quatro pessoas")
+    @Schema(description = "Observações adicionais do beneficiário", example = "Família composta por quatro pessoas")
     private String observacao;
 
     @jakarta.validation.constraints.NotBlank

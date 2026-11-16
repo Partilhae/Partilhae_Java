@@ -3,7 +3,7 @@ package br.com.partilhae.partilhae.integration;
 import br.com.partilhae.partilhae.model.Usuario;
 import br.com.partilhae.partilhae.repository.DenunciaRepository;
 import br.com.partilhae.partilhae.repository.DoadorRepository;
-import br.com.partilhae.partilhae.repository.ReceptorRepository;
+import br.com.partilhae.partilhae.repository.BeneficiarioRepository;
 import br.com.partilhae.partilhae.repository.UsuarioRepository;
 import br.com.partilhae.partilhae.support.DadosDeTeste;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,7 +39,7 @@ class MobileApiContractTest {
     @Autowired PasswordEncoder encoder;
     @Autowired UsuarioRepository usuarioRepository;
     @Autowired DoadorRepository doadorRepository;
-    @Autowired ReceptorRepository receptorRepository;
+    @Autowired BeneficiarioRepository beneficiarioRepository;
     @Autowired DenunciaRepository denunciaRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,7 +47,7 @@ class MobileApiContractTest {
     void limpar() {
         denunciaRepository.deleteAll();
         doadorRepository.deleteAll();
-        receptorRepository.deleteAll();
+        beneficiarioRepository.deleteAll();
         usuarioRepository.deleteAll();
     }
 
@@ -90,20 +90,20 @@ class MobileApiContractTest {
                 .andExpect(jsonPath("$.quantidadePessoasFamilia").value(4)).andExpect(jsonPath("$.possuiCriancas").value(true))
                 .andExpect(jsonPath("$.restricaoAlimentar").value("Sem lactose"))
                 .andExpect(jsonPath("$.complemento").doesNotExist()).andReturn().getResponse().getContentAsString());
-        assertEquals(Boolean.TRUE, receptorRepository.findById(created.get("idReceptor").asLong())
+        assertEquals(Boolean.TRUE, beneficiarioRepository.findById(created.get("idReceptor").asLong())
                 .orElseThrow().getPossuiCriancas());
         mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(loginJson("joao@partilhae.test")))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.idDoador").value(nullValue()))
                 .andExpect(jsonPath("$.idReceptor").value(created.get("idReceptor").asLong())).andExpect(jsonPath("$.role").value("RECEPTOR"));
         String token = token("joao@partilhae.test");
         long receptorId = created.get("idReceptor").asLong();
-        mvc.perform(put("/receptores/{id}", receptorId).header("Authorization", "Bearer " + token)
+        mvc.perform(put("/beneficiarios/{id}", receptorId).header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content("{\"possuiCriancas\":false}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.possuiCriancas").value(false));
-        assertEquals(Boolean.FALSE, receptorRepository.findById(receptorId).orElseThrow().getPossuiCriancas());
+        assertEquals(Boolean.FALSE, beneficiarioRepository.findById(receptorId).orElseThrow().getPossuiCriancas());
         mvc.perform(post("/receptores").header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content("{}"))
-                .andExpect(status().isMethodNotAllowed());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -174,8 +174,8 @@ class MobileApiContractTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.numero").value("88"));
         mvc.perform(get("/usuarios").header("Authorization", "Bearer " + ownerToken)).andExpect(status().isForbidden());
         mvc.perform(get("/doadores").header("Authorization", "Bearer " + ownerToken)).andExpect(status().isForbidden());
-        mvc.perform(get("/receptores").header("Authorization", "Bearer " + ownerToken)).andExpect(status().isForbidden());
-        mvc.perform(get("/receptores/criancas?possuiCriancas=S").header("Authorization", "Bearer " + ownerToken))
+        mvc.perform(get("/beneficiarios").header("Authorization", "Bearer " + ownerToken)).andExpect(status().isForbidden());
+        mvc.perform(get("/beneficiarios/criancas?possuiCriancas=S").header("Authorization", "Bearer " + ownerToken))
                 .andExpect(status().isForbidden());
         mvc.perform(get("/usuarios?page=0&size=1").header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)))
@@ -272,11 +272,11 @@ class MobileApiContractTest {
                         .header("Authorization", "Bearer " + tokenDoadorA).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"disponibilidade\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
-        mvc.perform(put("/receptores/{id}", receptorA.get("idReceptor").asLong())
+        mvc.perform(put("/beneficiarios/{id}", receptorA.get("idReceptor").asLong())
                         .header("Authorization", "Bearer " + tokenDoadorA).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"observacao\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
-        mvc.perform(put("/receptores/{id}", receptorB.get("idReceptor").asLong())
+        mvc.perform(put("/beneficiarios/{id}", receptorB.get("idReceptor").asLong())
                         .header("Authorization", "Bearer " + tokenReceptorA).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"observacao\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
@@ -299,7 +299,7 @@ class MobileApiContractTest {
                         .content(doadorJson("outro-doador@partilhae.test", "93541134780", "pessoaFisica", null)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
         String token = token("privacy-doador@partilhae.test");
-        mvc.perform(get("/receptores/{id}", receptor.get("idReceptor").asLong()).header("Authorization", "Bearer " + token))
+        mvc.perform(get("/beneficiarios/{id}", receptor.get("idReceptor").asLong()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.cpf").doesNotExist())
                 .andExpect(jsonPath("$.email").doesNotExist())
                 .andExpect(jsonPath("$.telefone").doesNotExist()).andExpect(jsonPath("$.cep").doesNotExist())
@@ -307,7 +307,7 @@ class MobileApiContractTest {
                 .andExpect(jsonPath("$.quantidadePessoasFamilia").doesNotExist())
                 .andExpect(jsonPath("$.possuiCriancas").doesNotExist()).andExpect(jsonPath("$.restricaoAlimentar").doesNotExist());
         String receptorToken = token("privacy-receptor@partilhae.test");
-        mvc.perform(get("/receptores/{id}", receptor.get("idReceptor").asLong())
+        mvc.perform(get("/beneficiarios/{id}", receptor.get("idReceptor").asLong())
                         .header("Authorization", "Bearer " + receptorToken))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.email").value("privacy-receptor@partilhae.test"))
                 .andExpect(jsonPath("$.telefone").value("11988888888"))

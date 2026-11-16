@@ -1,11 +1,11 @@
 package br.com.partilhae.partilhae.service;
 
-import br.com.partilhae.partilhae.dto.ReceptorRequestDTO;
-import br.com.partilhae.partilhae.dto.ReceptorResponseDTO;
-import br.com.partilhae.partilhae.dto.ReceptorUpdateRequestDTO;
-import br.com.partilhae.partilhae.model.Receptor;
+import br.com.partilhae.partilhae.dto.BeneficiarioRequestDTO;
+import br.com.partilhae.partilhae.dto.BeneficiarioResponseDTO;
+import br.com.partilhae.partilhae.dto.BeneficiarioUpdateRequestDTO;
+import br.com.partilhae.partilhae.model.Beneficiario;
 import br.com.partilhae.partilhae.model.Usuario;
-import br.com.partilhae.partilhae.repository.ReceptorRepository;
+import br.com.partilhae.partilhae.repository.BeneficiarioRepository;
 import br.com.partilhae.partilhae.repository.UsuarioRepository;
 import br.com.partilhae.partilhae.support.DadosDeTeste;
 import org.junit.jupiter.api.AfterEach;
@@ -30,15 +30,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ReceptorServiceTest {
-    @Mock ReceptorRepository receptorRepository;
+class BeneficiarioServiceTest {
+    @Mock BeneficiarioRepository beneficiarioRepository;
     @Mock UsuarioRepository usuarioRepository;
     @Mock UsuarioService usuarioService;
-    private ReceptorService service;
+    private BeneficiarioService service;
 
     @BeforeEach
     void preparar() {
-        service = new ReceptorService(receptorRepository, usuarioRepository, usuarioService);
+        service = new BeneficiarioService(beneficiarioRepository, usuarioRepository, usuarioService);
     }
 
     @AfterEach
@@ -50,7 +50,7 @@ class ReceptorServiceTest {
     @DisplayName("Cadastra pessoa física sem nome de organização")
     void cadastroPessoaFisica() {
         prepararCadastro();
-        ReceptorResponseDTO resposta = service.cadastrar(pedido("pessoaFisica", null, true));
+        BeneficiarioResponseDTO resposta = service.cadastrar(pedido("pessoaFisica", null, true));
         assertThat(resposta.tipoBeneficiario()).isEqualTo("pessoaFisica");
         assertThat(resposta.nomeOrganizacao()).isNull();
     }
@@ -59,7 +59,7 @@ class ReceptorServiceTest {
     @DisplayName("Cadastra ONG com nome de organização")
     void cadastroOng() {
         prepararCadastro();
-        ReceptorResponseDTO resposta = service.cadastrar(pedido("ONG", "  ONG Teste  ", false));
+        BeneficiarioResponseDTO resposta = service.cadastrar(pedido("ONG", "  ONG Teste  ", false));
         assertThat(resposta.tipoBeneficiario()).isEqualTo("ONG");
         assertThat(resposta.nomeOrganizacao()).isEqualTo("ONG Teste");
         assertThat(resposta.possuiCriancas()).isFalse();
@@ -89,10 +89,10 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Atualiza quantidade de pessoas e presença de crianças")
     void atualizarDadosFamiliares() {
-        Receptor receptor = receptorTitular();
+        Beneficiario receptor = receptorTitular();
         DadosDeTeste.logarComoReceptor(1L, 20L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
-        when(receptorRepository.save(receptor)).thenReturn(receptor);
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        when(beneficiarioRepository.save(receptor)).thenReturn(receptor);
         service.atualizar(20L, atualizacao(null, 6, false, null, null, null, null));
         assertThat(receptor.getQuantidadePessoasFamilia()).isEqualTo(6);
         assertThat(receptor.getPossuiCriancas()).isFalse();
@@ -101,10 +101,10 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Atualiza restrição alimentar")
     void atualizarRestricao() {
-        Receptor receptor = receptorTitular();
+        Beneficiario receptor = receptorTitular();
         DadosDeTeste.logarComoReceptor(1L, 20L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
-        when(receptorRepository.save(receptor)).thenReturn(receptor);
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        when(beneficiarioRepository.save(receptor)).thenReturn(receptor);
         service.atualizar(20L, atualizacao("Sem glúten", null, null, null, null, null, null));
         assertThat(receptor.getRestricaoAlimentar()).isEqualTo("Sem glúten");
     }
@@ -112,10 +112,10 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Atualiza observações privadas do receptor")
     void atualizarObservacao() {
-        Receptor receptor = receptorTitular();
+        Beneficiario receptor = receptorTitular();
         DadosDeTeste.logarComoReceptor(1L, 20L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
-        when(receptorRepository.save(receptor)).thenReturn(receptor);
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        when(beneficiarioRepository.save(receptor)).thenReturn(receptor);
         service.atualizar(20L, atualizacao(null, null, null, "Contato pela manhã", null, null, null));
         assertThat(receptor.getObservacao()).isEqualTo("Contato pela manhã");
     }
@@ -123,11 +123,11 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Atualiza os dados pessoais do titular")
     void atualizarDadosPessoais() {
-        Receptor receptor = receptorTitular();
+        Beneficiario receptor = receptorTitular();
         DadosDeTeste.logarComoReceptor(1L, 20L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
-        when(receptorRepository.save(receptor)).thenReturn(receptor);
-        service.atualizar(20L, new ReceptorUpdateRequestDTO("Nome atualizado", null, null, null,
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        when(beneficiarioRepository.save(receptor)).thenReturn(receptor);
+        service.atualizar(20L, new BeneficiarioUpdateRequestDTO("Nome atualizado", null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null));
         verify(usuarioService).atualizarParcial(receptor.getUsuario(), "Nome atualizado", null, null, null,
                 null, null, null, null, null, null, null, null);
@@ -138,13 +138,13 @@ class ReceptorServiceTest {
     void buscarPorCriancas() {
         DadosDeTeste.logarComoAdmin(90L);
         PageRequest pageable = PageRequest.of(0, 10);
-        Receptor semCriancas = receptorTitular();
+        Beneficiario semCriancas = receptorTitular();
         semCriancas.setPossuiCriancas(false);
-        when(receptorRepository.findByPossuiCriancas(false, pageable))
+        when(beneficiarioRepository.findByPossuiCriancas(false, pageable))
                 .thenReturn(new PageImpl<>(List.of(semCriancas), pageable, 1));
         assertThat(service.buscarPorPossuiCriancas("n", pageable).getContent())
-                .singleElement().extracting(ReceptorResponseDTO::possuiCriancas).isNull();
-        verify(receptorRepository).findByPossuiCriancas(false, pageable);
+                .singleElement().extracting(BeneficiarioResponseDTO::possuiCriancas).isNull();
+        verify(beneficiarioRepository).findByPossuiCriancas(false, pageable);
     }
 
     @Test
@@ -152,7 +152,7 @@ class ReceptorServiceTest {
     void buscarPorRestricao() {
         DadosDeTeste.logarComoAdmin(90L);
         PageRequest pageable = PageRequest.of(0, 10);
-        when(receptorRepository.findByRestricaoAlimentarContainingIgnoreCase("Lactose", pageable))
+        when(beneficiarioRepository.findByRestricaoAlimentarContainingIgnoreCase("Lactose", pageable))
                 .thenReturn(new PageImpl<>(List.of(receptorTitular()), pageable, 1));
         assertThat(service.buscarPorRestricaoAlimentar("Lactose", pageable).getTotalElements()).isEqualTo(1);
     }
@@ -160,8 +160,8 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Titular e administrador consultam os dados privados do perfil")
     void consultaTitularEAdministrador() {
-        Receptor receptor = receptorTitular();
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        Beneficiario receptor = receptorTitular();
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
         DadosDeTeste.logarComoReceptor(1L, 20L);
         assertThat(service.buscarPorId(20L).restricaoAlimentar()).isEqualTo("Sem lactose");
         DadosDeTeste.logarComoAdmin(90L);
@@ -171,9 +171,9 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Oculta contato, endereço e dados familiares para outros usuários")
     void consultaDeTerceiro() {
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptorTitular()));
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptorTitular()));
         DadosDeTeste.logarComoDoador(2L, 10L);
-        ReceptorResponseDTO resposta = service.buscarPorId(20L);
+        BeneficiarioResponseDTO resposta = service.buscarPorId(20L);
         assertThat(resposta.nomeUsuario()).isEqualTo("Usuário de Teste 1");
         assertThat(resposta.email()).isNull();
         assertThat(resposta.telefone()).isNull();
@@ -191,9 +191,9 @@ class ReceptorServiceTest {
     void listagemAdministrativa() {
         DadosDeTeste.logarComoAdmin(90L);
         PageRequest pageable = PageRequest.of(0, 10);
-        when(receptorRepository.findAll(pageable))
+        when(beneficiarioRepository.findAll(pageable))
                 .thenReturn(new PageImpl<>(List.of(receptorTitular()), pageable, 1));
-        ReceptorResponseDTO resposta = service.listar(pageable).getContent().getFirst();
+        BeneficiarioResponseDTO resposta = service.listar(pageable).getContent().getFirst();
         assertThat(resposta.email()).isEqualTo("usuario1@partilhae.test");
         assertThat(resposta.telefone()).isEqualTo("11900000000");
         assertThat(resposta.endereco()).isNull();
@@ -205,21 +205,21 @@ class ReceptorServiceTest {
     @DisplayName("Impede atualização do perfil de outro receptor")
     void naoAtualizaOutroReceptor() {
         DadosDeTeste.logarComoReceptor(2L, 30L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptorTitular()));
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptorTitular()));
         assertThatThrownBy(() -> service.atualizar(20L, atualizacao(null, null, null, null, null, null, null)))
                 .isInstanceOf(AccessDeniedException.class);
-        verify(receptorRepository, never()).save(any());
+        verify(beneficiarioRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Permite mudar ONG para pessoa física limpando nomeOrganizacao")
     void mudarOngParaPessoaFisica() {
-        Receptor receptor = receptorTitular();
+        Beneficiario receptor = receptorTitular();
         receptor.setTipoBeneficiario("ONG");
         receptor.setNomeOrganizacao("ONG Teste");
         DadosDeTeste.logarComoReceptor(1L, 20L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
-        when(receptorRepository.save(receptor)).thenReturn(receptor);
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        when(beneficiarioRepository.save(receptor)).thenReturn(receptor);
         service.atualizar(20L, atualizacao(null, null, null, null, "pessoaFisica", null, null));
         assertThat(receptor.getNomeOrganizacao()).isNull();
     }
@@ -227,42 +227,42 @@ class ReceptorServiceTest {
     @Test
     @DisplayName("Desativa o receptor logicamente sem excluir seu perfil")
     void desativacaoLogica() {
-        Receptor receptor = receptorTitular();
+        Beneficiario receptor = receptorTitular();
         DadosDeTeste.logarComoReceptor(1L, 20L);
-        when(receptorRepository.findById(20L)).thenReturn(Optional.of(receptor));
+        when(beneficiarioRepository.findById(20L)).thenReturn(Optional.of(receptor));
         service.desativar(20L);
         assertThat(receptor.getUsuario().getStatusConta()).isEqualTo("BLOQUEADA");
         verify(usuarioRepository).save(receptor.getUsuario());
-        verify(receptorRepository, never()).delete(any());
+        verify(beneficiarioRepository, never()).delete(any());
     }
 
     private void prepararCadastro() {
         Usuario usuario = DadosDeTeste.usuario(1L);
-        when(usuarioService.criar("Receptor Teste", "receptor@partilhae.test", "Senha@123", "52998224725",
+        when(usuarioService.criar("Beneficiario Teste", "receptor@partilhae.test", "Senha@123", "52998224725",
                 "11999999999", "01001000", "Rua de Teste", "10", null, "Centro", "São Paulo", "SP", "RECEPTOR"))
                 .thenReturn(usuario);
         when(usuarioRepository.save(usuario)).thenReturn(usuario);
-        when(receptorRepository.save(any(Receptor.class))).thenAnswer(invocacao -> {
-            Receptor salvo = invocacao.getArgument(0);
+        when(beneficiarioRepository.save(any(Beneficiario.class))).thenAnswer(invocacao -> {
+            Beneficiario salvo = invocacao.getArgument(0);
             salvo.setIdReceptor(20L);
             return salvo;
         });
     }
 
-    private static ReceptorRequestDTO pedido(String tipo, String organizacao, Boolean possuiCriancas) {
-        return new ReceptorRequestDTO("Receptor Teste", "receptor@partilhae.test", "Senha@123", "52998224725",
+    private static BeneficiarioRequestDTO pedido(String tipo, String organizacao, Boolean possuiCriancas) {
+        return new BeneficiarioRequestDTO("Beneficiario Teste", "receptor@partilhae.test", "Senha@123", "52998224725",
                 "11999999999", "01001000", "Rua de Teste", "10", null, "Centro", "São Paulo", "SP",
                 4, possuiCriancas, "Sem lactose", "Contato à tarde", tipo, organizacao);
     }
 
-    private static ReceptorUpdateRequestDTO atualizacao(String restricao, Integer quantidade, Boolean criancas,
+    private static BeneficiarioUpdateRequestDTO atualizacao(String restricao, Integer quantidade, Boolean criancas,
                                                         String observacao, String tipo, String nome,
                                                         String nomeUsuario) {
-        return new ReceptorUpdateRequestDTO(nomeUsuario, null, null, null, null, null, null, null, null,
+        return new BeneficiarioUpdateRequestDTO(nomeUsuario, null, null, null, null, null, null, null, null,
                 null, null, null, quantidade, criancas, restricao, observacao, tipo, nome);
     }
 
-    private static Receptor receptorTitular() {
-        return DadosDeTeste.receptor(20L, DadosDeTeste.usuario(1L));
+    private static Beneficiario receptorTitular() {
+        return DadosDeTeste.beneficiario(20L, DadosDeTeste.usuario(1L));
     }
 }

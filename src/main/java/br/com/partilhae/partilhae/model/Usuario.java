@@ -16,7 +16,7 @@ import lombok.*;
 @EqualsAndHashCode(of = "idUsuario")
 @Schema(
         name = "Usuario",
-        description = "Identidade base de um usuário do sistema (doador ou receptor)"
+        description = "Identidade base de um usuário do sistema (doador ou beneficiário)"
 )
 public class Usuario {
     @Id

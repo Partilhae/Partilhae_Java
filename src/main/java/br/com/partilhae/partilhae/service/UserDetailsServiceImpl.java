@@ -2,7 +2,7 @@ package br.com.partilhae.partilhae.service;
 
 import br.com.partilhae.partilhae.model.Usuario;
 import br.com.partilhae.partilhae.repository.DoadorRepository;
-import br.com.partilhae.partilhae.repository.ReceptorRepository;
+import br.com.partilhae.partilhae.repository.BeneficiarioRepository;
 import br.com.partilhae.partilhae.repository.UsuarioRepository;
 import br.com.partilhae.partilhae.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
     private final DoadorRepository doadorRepository;
-    private final ReceptorRepository receptorRepository;
+    private final BeneficiarioRepository beneficiarioRepository;
     @Value("${APP_ADMIN_EMAILS:}")
     private String adminEmails;
 
@@ -40,7 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     .orElseThrow(() -> new UsernameNotFoundException("Perfil de doador não encontrado"))
                     .getIdDoador();
         } else if ("RECEPTOR".equals(perfil)) {
-            idReceptor = receptorRepository.findByUsuario_IdUsuario(usuario.getIdUsuario())
+            idReceptor = beneficiarioRepository.findByUsuario_IdUsuario(usuario.getIdUsuario())
                     .orElseThrow(() -> new UsernameNotFoundException("Perfil de receptor não encontrado"))
                     .getIdReceptor();
         } else if ("ADMIN".equals(perfil) && isAdminEmail(usuario.getEmail())) {

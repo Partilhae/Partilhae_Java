@@ -2,7 +2,7 @@ package br.com.partilhae.partilhae.support;
 
 import br.com.partilhae.partilhae.model.Denuncia;
 import br.com.partilhae.partilhae.model.Doador;
-import br.com.partilhae.partilhae.model.Receptor;
+import br.com.partilhae.partilhae.model.Beneficiario;
 import br.com.partilhae.partilhae.model.Usuario;
 import br.com.partilhae.partilhae.security.UserDetailsImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -56,8 +56,8 @@ public final class DadosDeTeste {
         return doador;
     }
 
-    public static Receptor receptor(Long id, Usuario usuario) {
-        Receptor receptor = new Receptor();
+    public static Beneficiario beneficiario(Long id, Usuario usuario) {
+        Beneficiario receptor = new Beneficiario();
         receptor.setIdReceptor(id);
         receptor.setUsuario(usuario);
         receptor.setQuantidadePessoasFamilia(4);

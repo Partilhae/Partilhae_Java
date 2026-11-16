@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Não existe endpoint de signup aqui de propósito: cadastrar um
- * Doador ou Receptor já é feito por POST /doadores e
+ * Doador ou Beneficiário já é feito por POST /doadores e
  * POST /beneficiarios (ambos liberados no WebSecurityConfig), então não
  * faz sentido duplicar essa lógica em /auth/signup.
  */
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Autenticação", description = "Login e emissão de token JWT")
+@Tag(name = "Autenticação", description = "Endpoints para autenticação de usuários e emissão de tokens JWT.")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -39,12 +39,14 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(
-            summary = "Login",
-            description = "Autentica um Doador ou Receptor pelo e-mail e senha, retornando um token JWT"
+            summary = "Realizar login",
+            description = "Autentica o usuário com o e-mail e a senha informados e retorna um token JWT com os dados básicos da conta."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "E-mail ou senha inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "401", description = "E-mail ou senha inválidos"),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
     })
     public ResponseEntity<JwtResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto) {
         Authentication authentication = authenticationManager.authenticate(

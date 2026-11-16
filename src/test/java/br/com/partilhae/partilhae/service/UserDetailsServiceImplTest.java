@@ -2,7 +2,7 @@ package br.com.partilhae.partilhae.service;
 
 import br.com.partilhae.partilhae.model.Usuario;
 import br.com.partilhae.partilhae.repository.DoadorRepository;
-import br.com.partilhae.partilhae.repository.ReceptorRepository;
+import br.com.partilhae.partilhae.repository.BeneficiarioRepository;
 import br.com.partilhae.partilhae.repository.UsuarioRepository;
 import br.com.partilhae.partilhae.security.UserDetailsImpl;
 import br.com.partilhae.partilhae.support.DadosDeTeste;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class UserDetailsServiceImplTest {
     @Mock UsuarioRepository usuarioRepository;
     @Mock DoadorRepository doadorRepository;
-    @Mock ReceptorRepository receptorRepository;
+    @Mock BeneficiarioRepository beneficiarioRepository;
 
     @Test
     @DisplayName("Carrega doador com papel e identificador de perfil corretos")
@@ -43,7 +43,7 @@ class UserDetailsServiceImplTest {
     void carregaReceptor() {
         Usuario usuario = usuario(2L, "RECEPTOR", "receptor@partilhae.test");
         when(usuarioRepository.findByEmailIgnoreCase(usuario.getEmail())).thenReturn(Optional.of(usuario));
-        when(receptorRepository.findByUsuario_IdUsuario(2L)).thenReturn(Optional.of(DadosDeTeste.receptor(22L, usuario)));
+        when(beneficiarioRepository.findByUsuario_IdUsuario(2L)).thenReturn(Optional.of(DadosDeTeste.beneficiario(22L, usuario)));
         UserDetailsImpl detalhes = (UserDetailsImpl) service("").loadUserByUsername(usuario.getEmail());
         assertThat(detalhes.getIdDoador()).isNull();
         assertThat(detalhes.getIdReceptor()).isEqualTo(22L);
@@ -73,7 +73,7 @@ class UserDetailsServiceImplTest {
     void perfilReceptorInexistente() {
         Usuario usuario = usuario(30L, "RECEPTOR", "sem-receptor@partilhae.test");
         when(usuarioRepository.findByEmailIgnoreCase(usuario.getEmail())).thenReturn(Optional.of(usuario));
-        when(receptorRepository.findByUsuario_IdUsuario(30L)).thenReturn(Optional.empty());
+        when(beneficiarioRepository.findByUsuario_IdUsuario(30L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service("").loadUserByUsername(usuario.getEmail()))
                 .isInstanceOf(UsernameNotFoundException.class).hasMessage("Perfil de receptor não encontrado");
     }
@@ -128,7 +128,7 @@ class UserDetailsServiceImplTest {
         when(usuarioRepository.findByEmailIgnoreCase(bloqueado.getEmail())).thenReturn(Optional.of(bloqueado));
         when(doadorRepository.findByUsuario_IdUsuario(8L)).thenReturn(Optional.of(DadosDeTeste.doador(88L, bloqueado)));
         when(usuarioRepository.findByEmailIgnoreCase(inativo.getEmail())).thenReturn(Optional.of(inativo));
-        when(receptorRepository.findByUsuario_IdUsuario(9L)).thenReturn(Optional.of(DadosDeTeste.receptor(99L, inativo)));
+        when(beneficiarioRepository.findByUsuario_IdUsuario(9L)).thenReturn(Optional.of(DadosDeTeste.beneficiario(99L, inativo)));
         UserDetailsImpl blockedDetails = (UserDetailsImpl) service("").loadUserByUsername(bloqueado.getEmail());
         UserDetailsImpl inactiveDetails = (UserDetailsImpl) service("").loadUserByUsername(inativo.getEmail());
         assertThat(blockedDetails.isEnabled()).isFalse();
@@ -137,7 +137,7 @@ class UserDetailsServiceImplTest {
     }
 
     private UserDetailsServiceImpl service(String adminEmails) {
-        UserDetailsServiceImpl service = new UserDetailsServiceImpl(usuarioRepository, doadorRepository, receptorRepository);
+        UserDetailsServiceImpl service = new UserDetailsServiceImpl(usuarioRepository, doadorRepository, beneficiarioRepository);
         ReflectionTestUtils.setField(service, "adminEmails", adminEmails);
         return service;
     }

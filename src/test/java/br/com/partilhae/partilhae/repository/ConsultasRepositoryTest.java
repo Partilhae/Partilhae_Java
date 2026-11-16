@@ -1,7 +1,7 @@
 package br.com.partilhae.partilhae.repository;
 
 import br.com.partilhae.partilhae.model.Denuncia;
-import br.com.partilhae.partilhae.model.Receptor;
+import br.com.partilhae.partilhae.model.Beneficiario;
 import br.com.partilhae.partilhae.model.Usuario;
 import br.com.partilhae.partilhae.support.DadosDeTeste;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class ConsultasRepositoryTest {
     @Autowired UsuarioRepository usuarioRepository;
-    @Autowired ReceptorRepository receptorRepository;
+    @Autowired BeneficiarioRepository beneficiarioRepository;
     @Autowired DenunciaRepository denunciaRepository;
 
     @Test
@@ -48,19 +48,19 @@ class ConsultasRepositoryTest {
     @Test
     @DisplayName("Consulta receptores com e sem crianças")
     void buscaPorPresencaDeCriancas() {
-        Receptor comCriancas = novoReceptor("familia-a@partilhae.test", "52998224725", true, "Sem lactose");
-        Receptor semCriancas = novoReceptor("familia-b@partilhae.test", "11144477735", false, "Vegetariana");
-        assertThat(receptorRepository.findByPossuiCriancas(true, PageRequest.of(0, 10)).getContent())
+        Beneficiario comCriancas = novoReceptor("familia-a@partilhae.test", "52998224725", true, "Sem lactose");
+        Beneficiario semCriancas = novoReceptor("familia-b@partilhae.test", "11144477735", false, "Vegetariana");
+        assertThat(beneficiarioRepository.findByPossuiCriancas(true, PageRequest.of(0, 10)).getContent())
                 .containsExactly(comCriancas);
-        assertThat(receptorRepository.findByPossuiCriancas(false, PageRequest.of(0, 10)).getContent())
+        assertThat(beneficiarioRepository.findByPossuiCriancas(false, PageRequest.of(0, 10)).getContent())
                 .containsExactly(semCriancas);
     }
 
     @Test
     @DisplayName("Busca restrição alimentar sem diferenciar maiúsculas e minúsculas")
     void buscaPorRestricaoSemDiferenciarCaixa() {
-        Receptor receptor = novoReceptor("restricao@partilhae.test", "52998224725", false, "Sem LACTOSE");
-        assertThat(receptorRepository.findByRestricaoAlimentarContainingIgnoreCase("lactose",
+        Beneficiario receptor = novoReceptor("restricao@partilhae.test", "52998224725", false, "Sem LACTOSE");
+        assertThat(beneficiarioRepository.findByRestricaoAlimentarContainingIgnoreCase("lactose",
                 PageRequest.of(0, 10)).getContent()).containsExactly(receptor);
     }
 
@@ -85,12 +85,12 @@ class ConsultasRepositoryTest {
         assertThat(primeiraPagina.getTotalPages()).isEqualTo(2);
     }
 
-    private Receptor novoReceptor(String email, String cpf, boolean possuiCriancas, String restricao) {
+    private Beneficiario novoReceptor(String email, String cpf, boolean possuiCriancas, String restricao) {
         Usuario usuario = usuarioRepository.saveAndFlush(DadosDeTeste.usuarioSemId(email, cpf, "RECEPTOR"));
-        Receptor receptor = DadosDeTeste.receptor(null, usuario);
+        Beneficiario receptor = DadosDeTeste.beneficiario(null, usuario);
         receptor.setPossuiCriancas(possuiCriancas);
         receptor.setRestricaoAlimentar(restricao);
-        return receptorRepository.saveAndFlush(receptor);
+        return beneficiarioRepository.saveAndFlush(receptor);
     }
 
     private Denuncia salvarDenuncia(Usuario denunciante, Long idDoacao, LocalDateTime data) {

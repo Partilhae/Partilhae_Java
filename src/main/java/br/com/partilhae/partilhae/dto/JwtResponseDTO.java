@@ -28,7 +28,7 @@ public record JwtResponseDTO(
         @Schema(description = "Preenchido apenas se o usuário for um Doador", example = "1")
         Long idDoador,
 
-        @Schema(description = "Preenchido apenas se o usuário for um Receptor", example = "null")
+        @Schema(description = "Identificador do perfil de beneficiário quando a conta possui esse perfil; permanece null para outros perfis")
         Long idReceptor
 
 ) {
