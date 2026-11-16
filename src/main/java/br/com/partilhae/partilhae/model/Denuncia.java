@@ -27,7 +27,7 @@ public class Denuncia {
             strategy = GenerationType.SEQUENCE,
             generator = "denuncia_seq"
     )
-    @Column(name = "id_denuncia", columnDefinition = "INTEGER")
+    @Column(name = "id_denuncia")
     private Long idDenuncia;
 
     @NotBlank
@@ -49,22 +49,22 @@ public class Denuncia {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Usuario_id_denunciante", nullable = false, columnDefinition = "INTEGER")
+    @JoinColumn(name = "Usuario_id_denunciante", nullable = false)
     @JsonIgnore
     private Usuario denunciante;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Usuario_id_denunciado", columnDefinition = "INTEGER")
+    @JoinColumn(name = "Usuario_id_denunciado")
     @JsonIgnore
     private Usuario denunciado;
 
-    @Column(name = "Doacao_id_doacao", columnDefinition = "INTEGER")
+    @Column(name = "Doacao_id_doacao")
     private Long idDoacao;
 
-    @Column(name = "Conversa_id_conversa", columnDefinition = "INTEGER")
+    @Column(name = "Conversa_id_conversa")
     private Long idConversa;
 
-    @Column(name = "Solicitacao_id_solicitacao", columnDefinition = "INTEGER")
+    @Column(name = "Solicitacao_id_solicitacao")
     private Long idSolicitacao;
 
     @PrePersist

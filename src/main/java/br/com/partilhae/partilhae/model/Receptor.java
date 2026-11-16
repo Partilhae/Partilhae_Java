@@ -23,7 +23,7 @@ public class Receptor {
     @Id
     @SequenceGenerator(name = "receptor_seq", sequenceName = "seq_receptor", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receptor_seq")
-    @Column(name = "id_receptor", columnDefinition = "INTEGER")
+    @Column(name = "id_receptor")
     @Schema(description = "ID único do receptor", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long idReceptor;
 
@@ -56,7 +56,7 @@ public class Receptor {
 
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Usuario_id_usuario", nullable = false, unique = true, columnDefinition = "INTEGER")
+    @JoinColumn(name = "Usuario_id_usuario", nullable = false, unique = true)
     @Schema(hidden = true)
     private Usuario usuario;
 }

@@ -22,7 +22,7 @@ public class Usuario {
     @Id
     @SequenceGenerator(name = "usuario_seq", sequenceName = "seq_usuario", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuario_seq")
-    @Column(name = "id_usuario", columnDefinition = "INTEGER")
+    @Column(name = "id_usuario")
     @Schema(description = "ID único do usuário", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long idUsuario;
 
@@ -95,8 +95,8 @@ public class Usuario {
     private String cidade;
 
     @NotBlank
-    @Size(max = 80)
-    @Column(name = "nm_estado", length = 80, nullable = false)
+    @Size(max = 50)
+    @Column(name = "nm_estado", length = 50, nullable = false)
     @Schema(description = "Estado do usuário", example = "SP")
     private String estado;
 

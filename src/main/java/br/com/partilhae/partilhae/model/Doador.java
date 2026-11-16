@@ -21,7 +21,7 @@ public class Doador {
     @Id
     @SequenceGenerator(name = "doador_seq", sequenceName = "seq_doador", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doador_seq")
-    @Column(name = "id_doador", columnDefinition = "INTEGER")
+    @Column(name = "id_doador")
     @Schema(description = "ID único do doador", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private Long idDoador;
 
@@ -46,7 +46,7 @@ public class Doador {
 
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "Usuario_id_usuario", nullable = false, unique = true, columnDefinition = "INTEGER")
+    @JoinColumn(name = "Usuario_id_usuario", nullable = false, unique = true)
     @Schema(hidden = true)
     private Usuario usuario;
 }
