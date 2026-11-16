@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Schema(description = "Resposta de login: token JWT + dados básicos do usuário autenticado")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public record JwtResponseDTO(
-
         @Schema(description = "Token JWT a ser enviado no header Authorization: Bearer <token>")
         String token,
 
@@ -30,6 +29,5 @@ public record JwtResponseDTO(
 
         @Schema(description = "Identificador do perfil de beneficiário quando a conta possui esse perfil; permanece null para outros perfis")
         Long idReceptor
-
 ) {
 }

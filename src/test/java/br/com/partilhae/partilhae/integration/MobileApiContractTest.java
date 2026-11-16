@@ -73,7 +73,7 @@ class MobileApiContractTest {
 
         String token = token("maria@partilhae.test");
         mvc.perform(put("/doadores/{id}", doadorId).header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"disponibilidade\":\"Todos os dias\"}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"cpf\":\"52998224725\",\"disponibilidade\":\"Todos os dias\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.disponibilidade").value("Todos os dias"));
         Usuario updatedUser = usuarioRepository.findById(userId).orElseThrow();
         assertEquals("01001000", updatedUser.getCep());
@@ -98,7 +98,7 @@ class MobileApiContractTest {
         String token = token("joao@partilhae.test");
         long receptorId = created.get("idReceptor").asLong();
         mvc.perform(put("/beneficiarios/{id}", receptorId).header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"possuiCriancas\":false}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"cpf\":\"11144477735\",\"possuiCriancas\":false}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.possuiCriancas").value(false));
         assertEquals(Boolean.FALSE, beneficiarioRepository.findById(receptorId).orElseThrow().getPossuiCriancas());
         mvc.perform(post("/receptores").header("Authorization", "Bearer " + token)
@@ -107,9 +107,16 @@ class MobileApiContractTest {
     }
 
     @Test
-    void cadastroRejeitaCpfInvalidoDuplicidadeETiposInconsistentes() throws Exception {
-        mvc.perform(post("/doadores").contentType(MediaType.APPLICATION_JSON).content(doadorJson("invalid@partilhae.test", "12345678901", "pessoaFisica", null)))
-                .andExpect(status().isBadRequest());
+    void cadastroAceitaCpfFicticio() throws Exception {
+        mvc.perform(post("/doadores").contentType(MediaType.APPLICATION_JSON)
+                        .content(doadorJson("cpf-ficticio@partilhae.test", "12345678901", "pessoaFisica", null)))
+                .andExpect(status().isCreated());
+        assertEquals("12345678901", usuarioRepository.findByEmailIgnoreCase("cpf-ficticio@partilhae.test")
+                .orElseThrow().getCpf());
+    }
+
+    @Test
+    void cadastroRejeitaCamposObrigatoriosETiposInconsistentesEMantemDuplicidade() throws Exception {
         mvc.perform(post("/beneficiarios").contentType(MediaType.APPLICATION_JSON).content("""
                 {"nomeUsuario":"ONG","email":"ong@partilhae.test","cpf":"52998224725","telefone":"11999999999","senha":"Senha@123","cep":"01001000","endereco":"Rua A","numero":"1","bairro":"Centro","cidade":"São Paulo","estado":"SP","tipoBeneficiario":"ONG"}
                 """))
@@ -167,10 +174,10 @@ class MobileApiContractTest {
         mvc.perform(get("/usuarios/{id}", second.get("idUsuario").asLong()).header("Authorization", "Bearer " + ownerToken))
                 .andExpect(status().isForbidden());
         mvc.perform(put("/usuarios/{id}", second.get("idUsuario").asLong()).header("Authorization", "Bearer " + ownerToken)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"nomeUsuario\":\"Tentativa\"}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"cpf\":\"11144477735\",\"nomeUsuario\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
         mvc.perform(put("/usuarios/{id}", first.get("idUsuario").asLong()).header("Authorization", "Bearer " + ownerToken)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"numero\":\"88\"}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"cpf\":\"52998224725\",\"numero\":\"88\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.numero").value("88"));
         mvc.perform(get("/usuarios").header("Authorization", "Bearer " + ownerToken)).andExpect(status().isForbidden());
         mvc.perform(get("/doadores").header("Authorization", "Bearer " + ownerToken)).andExpect(status().isForbidden());
@@ -270,19 +277,19 @@ class MobileApiContractTest {
 
         mvc.perform(put("/doadores/{id}", doadorB.get("idDoador").asLong())
                         .header("Authorization", "Bearer " + tokenDoadorA).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"disponibilidade\":\"Tentativa\"}"))
+                        .content("{\"cpf\":\"11144477735\",\"disponibilidade\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
         mvc.perform(put("/beneficiarios/{id}", receptorA.get("idReceptor").asLong())
                         .header("Authorization", "Bearer " + tokenDoadorA).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"observacao\":\"Tentativa\"}"))
+                        .content("{\"cpf\":\"93541134780\",\"observacao\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
         mvc.perform(put("/beneficiarios/{id}", receptorB.get("idReceptor").asLong())
                         .header("Authorization", "Bearer " + tokenReceptorA).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"observacao\":\"Tentativa\"}"))
+                        .content("{\"cpf\":\"12345678909\",\"observacao\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
         mvc.perform(put("/doadores/{id}", doadorA.get("idDoador").asLong())
                         .header("Authorization", "Bearer " + tokenReceptorA).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"disponibilidade\":\"Tentativa\"}"))
+                        .content("{\"cpf\":\"52998224725\",\"disponibilidade\":\"Tentativa\"}"))
                 .andExpect(status().isForbidden());
     }
 

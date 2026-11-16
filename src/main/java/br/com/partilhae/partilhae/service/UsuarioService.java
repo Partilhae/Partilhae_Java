@@ -163,16 +163,7 @@ public class UsuarioService {
     }
 
     private static boolean cpfValido(String cpf) {
-        if (cpf == null || !cpf.matches("\\d{11}") || cpf.chars().distinct().count() == 1) return false;
-        int first = 0, second = 0;
-        for (int i = 0; i < 9; i++) first += (cpf.charAt(i) - '0') * (10 - i);
-        int digit1 = (first * 10) % 11;
-        if (digit1 == 10) digit1 = 0;
-        if (digit1 != cpf.charAt(9) - '0') return false;
-        for (int i = 0; i < 10; i++) second += (cpf.charAt(i) - '0') * (11 - i);
-        int digit2 = (second * 10) % 11;
-        if (digit2 == 10) digit2 = 0;
-        return digit2 == cpf.charAt(10) - '0';
+        return cpf != null && cpf.matches("\\d{11}");
     }
 
     private static String normalizarTelefone(String telefone) {

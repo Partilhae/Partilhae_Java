@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * e o esquema Bearer, que faz aparecer o botão "Authorize" para usar o
  * token JWT nas rotas protegidas.
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class OpenApiConfig {
 
     private static final String SECURITY_SCHEME_NAME = "bearerAuth";

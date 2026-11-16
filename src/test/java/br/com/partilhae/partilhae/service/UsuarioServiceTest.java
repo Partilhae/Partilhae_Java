@@ -57,11 +57,23 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Rejeita CPF inválido e CPF formado por dígitos iguais")
-    void cpfInvalido() {
-        assertThatThrownBy(() -> criar("11144477700", "cpf-invalido@partilhae.test"))
+    @DisplayName("Aceita CPF ficticio com onze digitos")
+    void cpfFicticioComOnzeDigitos() {
+        assertThat(criar("12345678901", "cpf-ficticio@partilhae.test").getCpf()).isEqualTo("12345678901");
+    }
+
+    @Test
+    @DisplayName("Aceita CPF com onze digitos repetidos")
+    void cpfComDigitosRepetidos() {
+        assertThat(criar("11111111111", "cpf-repetido@partilhae.test").getCpf()).isEqualTo("11111111111");
+    }
+
+    @Test
+    @DisplayName("Rejeita CPF com menos ou mais de onze digitos apos normalizacao")
+    void cpfComQuantidadeDeDigitosInvalida() {
+        assertThatThrownBy(() -> criar("123.456.789-0", "cpf-curto@partilhae.test"))
                 .isInstanceOf(IllegalArgumentException.class).hasMessage("CPF inválido");
-        assertThatThrownBy(() -> criar("11111111111", "cpf-repetido@partilhae.test"))
+        assertThatThrownBy(() -> criar("123.456.789-012", "cpf-longo@partilhae.test"))
                 .isInstanceOf(IllegalArgumentException.class).hasMessage("CPF inválido");
     }
 
