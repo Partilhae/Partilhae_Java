@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
@@ -22,8 +21,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UsuarioRepository usuarioRepository;
     private final DoadorRepository doadorRepository;
     private final BeneficiarioRepository beneficiarioRepository;
-    @Value("${APP_ADMIN_EMAILS:}")
-    private String adminEmails;
 
     @Override
     @Transactional(readOnly = true)
@@ -43,18 +40,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             idReceptor = beneficiarioRepository.findByUsuario_IdUsuario(usuario.getIdUsuario())
                     .orElseThrow(() -> new UsernameNotFoundException("Perfil de receptor não encontrado"))
                     .getIdReceptor();
-        } else if ("ADMIN".equals(perfil) && isAdminEmail(usuario.getEmail())) {
+        } else if ("ADMIN".equals(perfil)) {
             administrador = true;
         } else {
             throw new UsernameNotFoundException("Perfil de usuário inválido");
         }
 
         return UserDetailsImpl.fromUsuario(usuario, idDoador, idReceptor, administrador);
-    }
-
-    private boolean isAdminEmail(String email) {
-        if (adminEmails == null || adminEmails.isBlank()) return false;
-        return java.util.Arrays.stream(adminEmails.split(","))
-                .map(String::trim).anyMatch(config -> config.equalsIgnoreCase(email));
     }
 }

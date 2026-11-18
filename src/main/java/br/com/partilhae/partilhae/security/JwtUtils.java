@@ -38,7 +38,10 @@ public class JwtUtils {
                 .claim("idUsuario", principal.getIdUsuario())
                 .claim("role", principal.getAuthorities().stream()
                         .map(org.springframework.security.core.GrantedAuthority::getAuthority)
-                        .filter(authority -> authority.equals("ROLE_DOADOR") || authority.equals("ROLE_RECEPTOR"))
+                        .filter(authority -> 
+                                authority.equals("ROLE_DOADOR")
+                                || authority.equals("ROLE_RECEPTOR")
+                                || authority.equals("ROLE_ADMIN"))
                         .findFirst().orElse(""))
                 .claim("idDoador", principal.getIdDoador())
                 .claim("idReceptor", principal.getIdReceptor())

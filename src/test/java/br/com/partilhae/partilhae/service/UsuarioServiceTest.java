@@ -34,7 +34,7 @@ class UsuarioServiceTest {
 
     @BeforeEach
     void preparar() {
-        service = new UsuarioService(usuarioRepository, passwordEncoder, "admin@partilhae.test");
+        service = new UsuarioService(usuarioRepository, passwordEncoder);
     }
 
     @AfterEach
@@ -96,14 +96,13 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Não permite cadastro público com papel ADMIN ou e-mail reservado")
+    @DisplayName("Não permite cadastro público com perfil ADMIN")
     void cadastroPublicoNaoConcedeAdmin() {
         assertThatThrownBy(() -> service.criar("Admin", "novo@partilhae.test", "Senha@123",
                 "52998224725", "11999999999", "01001000", "Rua", "10", null,
                 "Centro", "São Paulo", "SP", "ADMIN"))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> criar("52998224725", "ADMIN@partilhae.test"))
-                .isInstanceOf(IllegalArgumentException.class).hasMessage("E-mail reservado para administração");
+
         verify(usuarioRepository, never()).save(any(Usuario.class));
     }
 

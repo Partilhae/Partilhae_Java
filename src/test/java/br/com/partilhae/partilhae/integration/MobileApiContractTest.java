@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = {"APP_ADMIN_EMAILS=admin@partilhae.test", "app.jwtSecret=integration-test-secret-with-at-least-32-bytes"})
+@SpringBootTest(properties = {"app.jwtSecret=integration-test-secret-with-at-least-32-bytes"})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class MobileApiContractTest {
@@ -131,12 +131,7 @@ class MobileApiContractTest {
                 .andExpect(status().isConflict());
         mvc.perform(post("/doadores").contentType(MediaType.APPLICATION_JSON).content(doadorJson("dup-cpf@partilhae.test", "52998224725", "pessoaFisica", null)))
                 .andExpect(status().isConflict());
-        mvc.perform(post("/doadores").contentType(MediaType.APPLICATION_JSON)
-                        .content(doadorJson("admin@partilhae.test", "93541134780", "pessoaFisica", null)))
-                .andExpect(status().isBadRequest());
         assertEquals(1, usuarioRepository.count());
-        org.assertj.core.api.Assertions.assertThat(usuarioRepository.findByEmailIgnoreCase("admin@partilhae.test"))
-                .isEmpty();
     }
 
     @Test

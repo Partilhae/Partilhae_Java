@@ -13,22 +13,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.util.Arrays;
-import java.util.Locale;
 
 @Service
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
-    private final String adminEmails;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
-                          @Value("${APP_ADMIN_EMAILS:}") String adminEmails) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
-        this.adminEmails = adminEmails;
     }
 
     @Transactional(readOnly = true)
@@ -80,9 +73,6 @@ public class UsuarioService {
         if (!"DOADOR".equals(perfil) && !"RECEPTOR".equals(perfil)) {
             throw new IllegalArgumentException("Somente DOADOR e RECEPTOR podem ser cadastrados publicamente");
         }
-        if (isEmailAdministrativo(emailObrigatorio)) {
-            throw new IllegalArgumentException("E-mail reservado para administração");
-        }
         if (senha == null || senha.isBlank()) throw new IllegalArgumentException("Senha é obrigatória");
         validarDadosUnicos(emailObrigatorio, cpf, null);
         Usuario usuario = new Usuario();
@@ -104,23 +94,11 @@ public class UsuarioService {
         return usuario;
     }
 
-    private boolean isEmailAdministrativo(String email) {
-        if (adminEmails == null || adminEmails.isBlank()) return false;
-        String normalizado = email.trim().toLowerCase(Locale.ROOT);
-        return Arrays.stream(adminEmails.split(","))
-                .map(String::trim)
-                .map(value -> value.toLowerCase(Locale.ROOT))
-                .anyMatch(normalizado::equals);
-    }
-
     @Transactional
     public void atualizarParcial(Usuario usuario, String nome, String email, String senha, String cpf,
                                  String telefone, String cep, String endereco, String numero,
                                  String complemento, String bairro, String cidade, String estado) {
         String emailNormalizado = normalizarOpcional(email);
-        if (emailNormalizado != null && isEmailAdministrativo(emailNormalizado)) {
-            throw new IllegalArgumentException("E-mail reservado para administração");
-        }
         String cpfNormalizado = cpf == null ? null : normalizarCpf(cpf);
         validarDadosUnicos(emailNormalizado, cpfNormalizado, usuario.getIdUsuario());
 
