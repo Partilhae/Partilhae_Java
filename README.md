@@ -6,7 +6,7 @@ API REST do **Partilhaê**, solução desenvolvida para a **Global Solution 2026
 |---|---|
 | **Aplicação online** | https://partilhae-java.onrender.com |
 | **Swagger** | https://partilhae-java.onrender.com/swagger-ui/index.html |
-| **Vídeo de apresentação** | *A adicionar* |
+| **Vídeo de apresentação** | [https://youtu.be/k6se8bsDsrs](https://youtu.be/k6se8bsDsrs) |
 | **Disciplina** | Java Advanced (FIAP, 2TDS) |
 
 > O Render (plano gratuito) desliga a aplicação depois de 15 minutos sem uso. A primeira requisição depois disso pode levar alguns segundos enquanto ela volta.
@@ -153,6 +153,14 @@ O acesso a informações privadas depende da titularidade ou da permissão admin
 
 Os códigos variam conforme a operação; consulte o Swagger para a documentação específica de cada endpoint.
 
+### Acesso administrativo
+
+O perfil `ADMIN` é destinado à moderação e ao gerenciamento da plataforma. As contas administrativas são cadastradas diretamente no banco de dados Oracle, com senhas armazenadas utilizando BCrypt, sem disponibilizar um endpoint público de cadastro.
+
+A autenticação ocorre pelo mesmo endpoint `POST /auth/login` utilizado pelos demais usuários. Após o login, o administrador recebe um JWT com a autoridade `ROLE_ADMIN`, permitindo o acesso às operações administrativas.
+
+O gerenciamento é realizado por meio do Swagger UI, sem necessidade de uma interface administrativa no aplicativo Mobile. Entre as operações disponíveis estão a listagem de usuários, a alteração do status de contas e a consulta e resolução de denúncias.
+
 ---
 
 ## 6. Fluxos funcionais completos
@@ -182,7 +190,9 @@ Os códigos variam conforme a operação; consulte o Swagger para a documentaç�
 
 ## 7. Testes automatizados
 
-A execução de verificação mais recente da refatoração foi relatada com **121 testes aprovados** (`BUILD SUCCESS`). Esse resultado foi informado pela ferramenta de desenvolvimento; execute a suíte novamente para validar o estado do seu checkout.
+O projeto possui testes automatizados que verificam as regras de negócio, a autenticação JWT, as permissões de acesso, os contratos REST e a documentação OpenAPI.
+
+A suíte foi validada localmente com o comando `.\mvnw.cmd clean verify`, concluindo a compilação e a execução dos testes com `BUILD SUCCESS`.
 
 ```bash
 ./mvnw clean verify
@@ -252,7 +262,6 @@ As credenciais e chaves devem ser definidas no ambiente, **nunca incluídas no r
 | `JWT_EXPIRATION_MS` | Não | Validade do token em ms; padrão `3600000` (1 hora) |
 | `SPRING_PROFILES_ACTIVE` | Não | `dev` (padrão), `prod` ou `test` |
 | `APP_CORS_ALLOWED_ORIGINS` | Conforme ambiente | Origens autorizadas para requisições CORS |
-| `APP_ADMIN_EMAILS` | Para administração | E-mails habilitados para contas administrativas provisionadas |
 | `PORT` | Não | Porta HTTP no perfil `prod`; padrão `8080` |
 
 Exemplo em terminal Unix:
